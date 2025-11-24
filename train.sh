@@ -1,0 +1,28 @@
+CUDA_VISIBLE_DEVICES=0,1,2 NPROC_PER_NODE=3 \
+nohup swift pt \
+--train_type 'full' \
+--torch_dtype 'bfloat16' \
+--model 'Qwen/Qwen3-1.7B' \
+--model_type 'qwen3' \
+--template 'qwen3' \
+--dataset 'AI-ModelScope/LongAlpaca-12k' \
+--new_special_tokens '/mnt/PublicStorageNew1/liushuai/ms-swift/swift/new_special_tokens/token.txt' \
+--torch_dtype bfloat16 \
+--num_train_epochs 5 \
+--per_device_train_batch_size 4 \
+--per_device_eval_batch_size 4 \
+--split_dataset_ratio '0.1' \
+--truncation_strategy 'left' \
+--max_length '2048' \
+--task_type 'causal_lm' \
+--learning_rate '1e-05' \
+--gradient_accumulation_steps '16' \
+--eval_steps '500' \
+--output_dir '/mnt/PublicStorageNew1/liushuai/output/v6-20251124-142613' \
+--neftune_noise_alpha '0' \
+--report_to 'wandb' \
+--deepspeed zero2 \
+--add_version False \
+--output_dir /mnt/PublicStorageNew1/liushuai/output/v6-20251124-142613/v1-20251124-153145 \
+--logging_dir /mnt/PublicStorageNew1/liushuai/output/v6-20251124-142613/v1-20251124-153145/runs \
+--ignore_args_error True > /mnt/PublicStorageNew1/liushuai/output/v6-20251124-142613/v1-20251124-153145/runs/run.log 2>&1 & 
