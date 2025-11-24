@@ -1,63 +1,90 @@
-# Contributor Guide
+# Contributing to verl
 
-_Welcome to offer PRs, bug reports, documentation supplements or other types of contributions to SWIFT!_
+Thank you for considering a contribution to verl! We welcome contributions of any kind - bug fixes, enhancements, documentation improvements, or even just feedback. Whether you're an experienced developer or this is your first open-source project, your help is invaluable.
 
-## Table of Contents
-- [Code of Conduct](#-code-of-conduct)
-- [Contribution Process](#-contribution-process)
-- [Hardware support](#-Hardware-support)
+Your support can take many forms:
+- Report issues or unexpected behaviors.
+- Suggest or implement new features.
+- Improve or expand documentation.
+- Review pull requests and assist other contributors.
+- Spread the word: share verl in blog posts, social media, or give the repo a ⭐.
 
-## 📖 Code of Conduct
-Please refer to our [Code of Conduct documentation](./CODE_OF_CONDUCT.md).
+## Finding Issues to Contribute
 
-## 🔁 Contribution Process
-### What We Need
-- New Technologies and New Models: SWIFT needs to support more open-source models and datasets, or new technologies that we have not paid attention to. If you are interested please submit a PR to us.
-- Technical Propagation: If you are interested in technical propagation, you are welcome to help us write tutorials, documents or videos on any website, and send us the link.
-- Community Contribution: You can write technical articles related to SWIFT, and submit them to us. After review and approval, we will publish them on the official ModelScope accounts (Zhihu, WeChat, etc.), with your name assigned.
+Looking for ways to dive in? Check out these issues:
+- [Good first issues](https://github.com/volcengine/verl/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22)
+- [Call for contribution](https://github.com/volcengine/verl/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22call%20for%20contribution%22)
+Furthermore, you can learn the development plan and roadmap via [RFC](https://github.com/volcengine/verl/issues?q=is%3Aissue%20state%3Aopen%20label%3ARFC) and [Roadmap](https://github.com/volcengine/verl/issues?q=state%3Aopen%20label%3A%22roadmap%22).
 
-### Incentives
-- we will issue electronic certificates to contributors on behalf of the ModelScope community, to encourage your selfless contributions.
-- We will offer small souvenirs related to the ModelScope Community.
-- We will provide free A10 computing power during the development period. For more details, please refer to [Hardware-support](#-Hardware-support) section.
 
-### Submitting PR (Pull Requests)
+## Developing
 
-Any feature development is carried out in the form of Fork and then PR on GitHub.
-1. Fork: Go to the [ms-swift](https://github.com/modelscope/ms-swift) page and click the **Fork button**. After completion, a SWIFT code repository will be cloned under your personal organization.
-2. Clone: Clone the code repository generated in the first step to your local machine and **create a new branch** for development. During development, please click the **Sync Fork button** in time to synchronize with the `main` branch to prevent code expiration and conflicts.
-3. Submit PR: After development and testing, push the code to the remote branch. On GitHub, go to the **Pull Requests page**, create a new PR, select your code branch as the source branch, and the `modelscope/swift:main` branch as the target branch.
+- **Python-only**: install verl via `pip install -e .[test,vllm]` or `pip install -e .[test,sglang]` and iterate quickly. For full dependency setup, check out the verl [installation doc](https://verl.readthedocs.io/en/latest/start/install.html).
 
-4. Write Description: It is necessary to provide a good feature description in the PR, so that the reviewers know the content of your modification.
-5. Review: We hope that the code to be merged is concise and efficient, so we may raise some questions and discuss them. Please note that any issues raised in the review are aimed at the code itself, not at you personally. Once all issues are discussed and resolved, your code will be approved.
+## Code Linting and Formatting
 
-### Code Standards and Development Approach
-SWIFT has conventional variable naming conventions and development approaches. Please follow these approaches as much as possible during development.
-1. Variable names are separated by underscores, and class names are named with the first letter of each word capitalized.
-2. All Python indentation uses four spaces instead of a tab.
-3. Choose well-known open-source libraries, avoid using closed-source libraries or unstable open-source libraries, and avoid repeating the existing code.
+We rely on pre-commit to keep our code consistent. To set it up:
 
-After the PR is submitted, SWIFT will perform two types of tests:
-- Code Lint Test: A static code compliance check test. please make sure that you have performed code lint locally in advance.
-```shell
-pip install pre-commit # In the swift folder
-pre-commit run --all-files # Fix the errors reported by pre-commit until all checks are successful
+```bash
+pip install pre-commit
+pre-commit install
+# for staged changes
+pre-commit run
+# for all files in the repo
+pre-commit run --all-files
+# run a specific hook with pre-commit
+# pre-commit run --all-files --show-diff-on-failure --color=always <hood-id>
+pre-commit run --all-files --show-diff-on-failure --color=always ruff
+pre-commit run --all-files --show-diff-on-failure --color=always autogen-trainer-cfg
 ```
-- CI Tests: Smoke tests and unit tests, please refer to the next section.
 
-### Running CI Tests
-Before submitting the PR, please ensure that your development code is protected by test cases, such as smoke tests for new features, or unit tests for various edge cases. Reviewers will also pay attention to this during code review. At the same time, there will be dedicated services running CI Tests, running all test cases, and the code can only be merged after the test cases pass.
+## Testing
 
-Additionally, since some important tests have been skipped due to long running time, to ensure that your logic is correct, you can run the test locally:
-```shell
-python tests/llm/test_run.py
+Our test suites run on GitHub Actions. Check these workflows for details:
+- [GPU unit tests](https://github.com/volcengine/verl/blob/main/.github/workflows/gpu_unit_tests.yml)
+- [CPU unit tests](https://github.com/volcengine/verl/blob/main/.github/workflows/cpu_unit_tests.yml)
+- [vLLM tests](https://github.com/volcengine/verl/blob/main/.github/workflows/vllm.yml)
+- [SGLang tests](https://github.com/volcengine/verl/blob/main/.github/workflows/sgl.yml)
+
+### Adding CI tests
+
+If possible, please add CI test(s) for your new feature:
+
+1. Find the most relevant workflow yml file, which usually corresponds to a `hydra` default config (e.g. `ppo_trainer`, `ppo_megatron_trainer`, `sft_trainer`, etc).
+2. Add related path patterns to the `paths` section if not already included.
+3. Minimize the workload of the test script(s) (see existing scripts for examples).
+
+## Building the Docs
 ```
-Please make sure this test can pass normally.
+# Ensure verl is on your PYTHONPATH, e.g.:
+pip install -e .[test]
 
-## ✅ Hardware support
+# Install documentation dependencies
+cd docs
+pip install -r requirements-docs.txt
 
-SWIFT will provide hardware support for developers, including free GPUs. If needed, please email us ([contact@modelscope.cn](mailto:contact@modelscope.cn)) or join our WeChat group:
+# Generate HTML docs
+make clean
+make html
 
-<p align="left">
-<img src="asset/wechat.png" width="250" style="display: inline-block;">
-</p>
+# Preview locally
+python -m http.server -d _build/html/
+```
+Open your browser at http://localhost:8000 to explore the docs.
+
+## Pull Requests & Code Reviews
+
+Thanks for submitting a PR! To streamline reviews:
+- Follow our Pull Request Template for title format and checklist.
+- Adhere to our pre-commit lint rules and ensure all checks pass.
+- Update docs for any user-facing changes.
+- Add or update tests in the CI workflows, or explain why tests aren't applicable.
+
+## License
+
+See the [LICENSE](https://github.com/volcengine/verl/blob/main/LICENSE) file for full details.
+
+## Thank You
+
+We appreciate your contributions to verl. Your efforts help make the project stronger and more user-friendly. Happy coding!
+

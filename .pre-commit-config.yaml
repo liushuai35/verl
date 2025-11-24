@@ -1,52 +1,45 @@
 repos:
-  - repo: https://github.com/pycqa/flake8.git
-    rev: 4.0.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.12.2"
     hooks:
-      - id: flake8
-        exclude: |
-            (?x)^(
-                thirdparty/|
-                examples/|
-                tests/run.py
-            )$
-  - repo: https://github.com/PyCQA/isort.git
-    rev: 4.3.21
+      - id: ruff
+        args: ["--fix", "--show-fixes", "--output-format=full"]
+        exclude: ^.*\.(ipynb)$
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.17.0'
     hooks:
-      - id: isort
-        exclude: |
-            (?x)^(
-                examples/|
-                tests/run.py|
-                swift/cli/sft.py
-            )$
-  - repo: https://github.com/pre-commit/mirrors-yapf.git
-    rev: v0.30.0
+      - id: mypy
+
+  - repo: local
     hooks:
-      - id: yapf
-        exclude: |
-            (?x)^(
-                thirdparty/|
-                examples/|
-                tests/run.py
-            )$
-  - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v3.1.0
+      - id: autogen-trainer-cfg
+        name: Generate and verify verl/trainer/config/_generated_*.yaml
+        entry: scripts/generate_trainer_config.sh
+        language: script
+        pass_filenames: false
+
+  - repo: local
     hooks:
-      - id: trailing-whitespace
-        exclude: thirdparty/|tests/run.py
-      - id: check-yaml
-        exclude: thirdparty/|tests/run.py
-      - id: end-of-file-fixer
-        exclude: thirdparty/|tests/run.py
-      - id: requirements-txt-fixer
-        exclude: thirdparty/|tests/run.py
-      - id: double-quote-string-fixer
-        exclude: thirdparty/|tests/run.py
-      - id: check-merge-conflict
-        exclude: thirdparty/|tests/run.py
-      - id: fix-encoding-pragma
-        exclude: thirdparty/|tests/run.py
-        args: ["--remove"]
-      - id: mixed-line-ending
-        exclude: thirdparty/|tests/run.py
-        args: ["--fix=lf"]
+      - id: check-docstrings
+        name: Check doc string coverage
+        entry: python3 tests/special_sanity/check_docstrings.py
+        language: python
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: check-license
+        name: Check license
+        entry: python3 tests/special_sanity/check_license.py --directories examples recipe scripts tests verl setup.py
+        language: python
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: compileall
+        name: Compile all python files
+        entry: sh -c 'PYTHONWARNINGS=error python3 -m compileall -q .'
+        language: python
+        pass_filenames: false

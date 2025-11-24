@@ -1,163 +1,98 @@
-# Copyright (c) Alibaba, Inc. and its affiliates.
-# !/usr/bin/env python
+# Copyright 2024 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# setup.py is the fallback installation script when pyproject.toml does not work
 import os
+from pathlib import Path
+
 from setuptools import find_packages, setup
-from typing import List
+
+version_folder = os.path.dirname(os.path.join(os.path.abspath(__file__)))
+
+with open(os.path.join(version_folder, "verl/version/version")) as f:
+    __version__ = f.read().strip()
+
+install_requires = [
+    "accelerate",
+    "codetiming",
+    "datasets",
+    "dill",
+    "hydra-core",
+    "numpy<2.0.0",
+    "pandas",
+    "peft",
+    "pyarrow>=19.0.0",
+    "pybind11",
+    "pylatexenc",
+    "ray[default]>=2.41.0",
+    "torchdata",
+    "tensordict>=0.8.0,<=0.10.0,!=0.9.0",
+    "transformers",
+    "wandb",
+    "packaging>=20.0",
+    "tensorboard",
+]
+
+TEST_REQUIRES = ["pytest", "pre-commit", "py-spy", "pytest-asyncio", "pytest-rerunfailures"]
+PRIME_REQUIRES = ["pyext"]
+GEO_REQUIRES = ["mathruler", "torchvision", "qwen_vl_utils"]
+GPU_REQUIRES = ["liger-kernel", "flash-attn"]
+MATH_REQUIRES = ["math-verify"]  # Add math-verify as an optional dependency
+VLLM_REQUIRES = ["tensordict>=0.8.0,<=0.10.0,!=0.9.0", "vllm>=0.8.5,<=0.11.0"]
+SGLANG_REQUIRES = [
+    "tensordict>=0.8.0,<=0.10.0,!=0.9.0",
+    "sglang[srt,openai]==0.5.5",
+    "torch==2.8.0",
+]
+TRL_REQUIRES = ["trl<=0.9.6"]
+MCORE_REQUIRES = ["mbridge"]
+TRANSFERQUEUE_REQUIRES = ["TransferQueue @ git+https://github.com/TransferQueue/TransferQueue.git@68c04e7"]
+
+extras_require = {
+    "test": TEST_REQUIRES,
+    "prime": PRIME_REQUIRES,
+    "geo": GEO_REQUIRES,
+    "gpu": GPU_REQUIRES,
+    "math": MATH_REQUIRES,
+    "vllm": VLLM_REQUIRES,
+    "sglang": SGLANG_REQUIRES,
+    "trl": TRL_REQUIRES,
+    "mcore": MCORE_REQUIRES,
+    "transferqueue": TRANSFERQUEUE_REQUIRES,
+}
 
 
-def readme():
-    with open('README.md', encoding='utf-8') as f:
-        content = f.read()
-    return content
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
-
-version_file = 'swift/version.py'
-
-
-def get_version():
-    with open(version_file, 'r', encoding='utf-8') as f:
-        exec(compile(f.read(), version_file, 'exec'))
-    return locals()['__version__']
-
-
-def parse_requirements(fname='requirements.txt', with_version=True):
-    """
-    Parse the package dependencies listed in a requirements file but strips
-    specific versioning information.
-
-    Args:
-        fname (str): path to requirements file
-        with_version (bool, default=False): if True include version specs
-
-    Returns:
-        List[str]: list of requirements items
-
-    CommandLine:
-        python -c "import setup; print(setup.parse_requirements())"
-    """
-    import re
-    import sys
-    from os.path import exists
-    require_fpath = fname
-
-    def parse_line(line):
-        """
-        Parse information from a line in a requirements text file
-        """
-        if line.startswith('-r '):
-            # Allow specifying requirements in other files
-            target = line.split(' ')[1]
-            relative_base = os.path.dirname(fname)
-            absolute_target = os.path.join(relative_base, target)
-            for info in parse_require_file(absolute_target):
-                yield info
-        else:
-            info = {'line': line}
-            if line.startswith('-e '):
-                info['package'] = line.split('#egg=')[1]
-            else:
-                # Remove versioning from the package
-                pat = '(' + '|'.join(['>=', '==', '>']) + ')'
-                parts = re.split(pat, line, maxsplit=1)
-                parts = [p.strip() for p in parts]
-
-                info['package'] = parts[0]
-                if len(parts) > 1:
-                    op, rest = parts[1:]
-                    if ';' in rest:
-                        # Handle platform specific dependencies
-                        # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
-                        version, platform_deps = map(str.strip, rest.split(';'))
-                        info['platform_deps'] = platform_deps
-                    else:
-                        version = rest  # NOQA
-                    info['version'] = (op, version)
-            yield info
-
-    def parse_require_file(fpath):
-        with open(fpath, 'r', encoding='utf-8') as f:
-            for line in f.readlines():
-                line = line.strip()
-                if line.startswith('http'):
-                    print('skip http requirements %s' % line)
-                    continue
-                if line and not line.startswith('#') and not line.startswith('--'):
-                    for info in parse_line(line):
-                        yield info
-                elif line and line.startswith('--find-links'):
-                    eles = line.split()
-                    for e in eles:
-                        e = e.strip()
-                        if 'http' in e:
-                            info = dict(dependency_links=e)
-                            yield info
-
-    def gen_packages_items():
-        items = []
-        deps_link = []
-        if exists(require_fpath):
-            for info in parse_require_file(require_fpath):
-                if 'dependency_links' not in info:
-                    parts = [info['package']]
-                    if with_version and 'version' in info:
-                        parts.extend(info['version'])
-                    if not sys.version.startswith('3.4'):
-                        # apparently package_deps are broken in 3.4
-                        platform_deps = info.get('platform_deps')
-                        if platform_deps is not None:
-                            parts.append(';' + platform_deps)
-                    item = ''.join(parts)
-                    items.append(item)
-                else:
-                    deps_link.append(info['dependency_links'])
-        return items, deps_link
-
-    return gen_packages_items()
-
-
-if __name__ == '__main__':
-    install_requires, deps_link = parse_requirements('requirements.txt')
-    extra_requires = {}
-    all_requires = []
-    extra_requires['eval'], _ = parse_requirements('requirements/eval.txt')
-    extra_requires['swanlab'], _ = parse_requirements('requirements/swanlab.txt')
-    all_requires.extend(install_requires)
-    all_requires.extend(extra_requires['eval'])
-    all_requires.extend(extra_requires['swanlab'])
-    extra_requires['all'] = all_requires
-
-    setup(
-        name='ms_swift',
-        version=get_version(),
-        description='Swift: Scalable lightWeight Infrastructure for Fine-Tuning',
-        long_description=readme(),
-        long_description_content_type='text/markdown',
-        author='DAMO ModelScope teams',
-        author_email='contact@modelscope.cn',
-        keywords='python, petl, efficient tuners',
-        url='https://github.com/modelscope/swift',
-        packages=find_packages(exclude=('configs', 'demo')),
-        include_package_data=True,
-        package_data={
-            '': ['*.h', '*.cpp', '*.cu'],
-        },
-        classifiers=[
-            'Development Status :: 4 - Beta',
-            'License :: OSI Approved :: Apache Software License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Programming Language :: Python :: 3.11',
-            'Programming Language :: Python :: 3.12',
-        ],
-        license='Apache License 2.0',
-        tests_require=parse_requirements('requirements/tests.txt'),
-        install_requires=install_requires,
-        extras_require=extra_requires,
-        entry_points={
-            'console_scripts': ['swift=swift.cli.main:cli_main', 'megatron=swift.cli._megatron.main:cli_main']
-        },
-        dependency_links=deps_link,
-        zip_safe=False)
+setup(
+    name="verl",
+    version=__version__,
+    package_dir={"": "."},
+    packages=find_packages(where="."),
+    url="https://github.com/volcengine/verl",
+    license="Apache 2.0",
+    author="Bytedance - Seed - MLSys",
+    author_email="zhangchi.usc1992@bytedance.com, gmsheng@connect.hku.hk",
+    description="verl: Volcano Engine Reinforcement Learning for LLM",
+    install_requires=install_requires,
+    extras_require=extras_require,
+    package_data={
+        "": ["version/*"],
+        "verl": ["trainer/config/*.yaml"],
+    },
+    include_package_data=True,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+)

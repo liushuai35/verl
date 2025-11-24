@@ -1,15 +1,27 @@
+
+**/*.pt
+**/checkpoints
+**/wget-log
+**/_build/
+**/*.ckpt
+**/outputs
+**/*.tar.gz
+**/playground
+**/wandb
+
 # Byte-compiled / optimized / DLL files
-tmp
-*.ttf
 __pycache__/
 *.py[cod]
 *$py.class
-test.py
+dataset/*
+tensorflow/my_graph/*
+.idea/
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -21,13 +33,10 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
+tmp/
 *.egg-info/
 .installed.cfg
 *.egg
-/package
-/temp
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -47,9 +56,10 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*.cover
+*,cover
 .hypothesis/
-.pytest_cache/
+pytest.ini
+output.txt
 
 # Translations
 *.mo
@@ -58,7 +68,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
 
 # Flask stuff:
 instance/
@@ -73,7 +82,7 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
+# IPython Notebook
 .ipynb_checkpoints
 
 # pyenv
@@ -82,70 +91,41 @@ target/
 # celery beat schedule file
 celerybeat-schedule
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# dotenv
 .env
-.venv
-env/
+
+# virtualenv
 venv/
+.venv/
 ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
-.spyproject
 
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-
+# vscode
 .vscode
-.idea
-.run
 
-# custom
-*.pkl
-*.pkl.json
-*.log.json
-*.whl
-*.tar.gz
-*.swp
-*.log
-*.tar.gz
-source.sh
-tensorboard.sh
+# Mac
 .DS_Store
-replace.sh
-result.png
-result.jpg
-result.mp4
-output/
-outputs/
-wandb/
-*.out
-benchmarks/
-eval_output/
-eval_outputs/
-transformers/
-vlmeval/
-my_model/
-/data
-result/
-images
-/custom/
-megatron_output/
 
-# Pytorch
-*.pth
-*.pt
+# vim
+*.swp
 
-# ast template
-ast_index_file.py
+# emacs
+*~
+
+# ckpt
+*.lock
+
+# data
+*.parquet
+
+
+# local logs
+logs
+log
+outputs
+.history

@@ -1,37 +1,22 @@
-## maintain docs
-1. build docs
-    ```shell
-    # in root directory:
-    make docs
-    ```
+# verl documentations
 
-2. doc string format
+## Build the docs
 
-    We adopt the google style docstring format as the standard, please refer to the following documents.
-    1. Google Python style guide docstring [link](http://google.github.io/styleguide/pyguide.html#381-docstrings)
-    2. Google docstring example [link](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
-    3. sample：torch.nn.modules.conv [link](https://pytorch.org/docs/stable/_modules/torch/nn/modules/conv.html#Conv1d)
-    4. load function as an example：
+```bash
+# If you want to view auto-generated API docstring, please make sure verl is available in python path. For instance, install verl via:
+# pip install .. -e[test]
 
-    ```python
-    def load(file, file_format=None, **kwargs):
-        """Load data from json/yaml/pickle files.
+# Install dependencies needed for building docs.
+pip install -r requirements-docs.txt
 
-        This method provides a unified api for loading data from serialized files.
+# Build the docs.
+make clean
+make html
+```
 
-        Args:
-            file (str or :obj:`Path` or file-like object): Filename or a file-like
-                object.
-            file_format (str, optional): If not specified, the file format will be
-                inferred from the file extension, otherwise use the specified one.
-                Currently supported formats include "json", "yaml/yml".
+## Open the docs with your browser
 
-        Examples:
-            >>> load('/path/of/your/file')  # file is stored in disk
-            >>> load('https://path/of/your/file')  # file is stored on internet
-            >>> load('oss://path/of/your/file')  # file is stored in petrel
-
-        Returns:
-            The content from the file.
-        """
-    ```
+```bash
+python -m http.server -d _build/html/
+```
+Launch your browser and navigate to http://localhost:8000 to view the documentation. Alternatively you could drag the file `_build/html/index.html` to your local browser and view directly.
