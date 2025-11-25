@@ -33,7 +33,7 @@ swift sft \
 
 
 CUDA_VISIBLE_DEVICES=0,1,2 NPROC_PER_NODE=3 \
-nohup swift sft \
+swift sft \
 --torch_dtype 'bfloat16' \
 --model 'Qwen/Qwen3-8B-Base' \
 --model_type 'qwen3' \
@@ -43,10 +43,11 @@ nohup swift sft \
 --max_length '4096' \
 --task_type 'causal_lm' \
 --lora_dtype 'bfloat16' \
---per_device_train_batch_size '2' \
---per_device_eval_batch_size '2' \
+--per_device_train_batch_size '1' \
+--per_device_eval_batch_size '1' \
 --learning_rate '1e-5' \
 --num_train_epochs '10' \
+--truncation_strategy left \
 --gradient_accumulation_steps '8' \
 --eval_steps '100' \
 --save_steps '200' \
@@ -57,4 +58,4 @@ nohup swift sft \
 --add_version False \
 --output_dir /mnt/PublicStorageNew1/liushuai/ms-swift/output/Qwen3-8B-Base/v0-20251125-210325 \
 --logging_dir /mnt/PublicStorageNew1/liushuai/ms-swift/output/Qwen3-8B-Base/v0-20251125-210325/runs \
---ignore_args_error True > /mnt/PublicStorageNew1/liushuai/ms-swift/output/Qwen3-8B-Base/v0-20251125-210325/runs/run.log 2>&1 & \
+--ignore_args_error True 

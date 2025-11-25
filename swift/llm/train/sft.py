@@ -44,7 +44,7 @@ class SwiftSft(SwiftPipeline, TunerMixin):
 
     def _prepare_model_tokenizer(self, **kwargs):
         args = self.args
-        self.model, self.processor = args.get_model_processor(**kwargs)
+        self.model, self.processor = args.get_model_processor(**kwargs) # ms-swift/swift/llm/model/register.py
         if args.sequence_parallel_size > 1:
             from swift.trainers.sequence_parallel import sequence_parallel
             sequence_parallel.prepare(
