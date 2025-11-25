@@ -9,8 +9,8 @@ nohup swift pt \
 --new_special_tokens '/mnt/PublicStorageNew1/liushuai/ms-swift/swift/new_special_tokens/token.txt' \
 --torch_dtype bfloat16 \
 --num_train_epochs 5 \
---per_device_train_batch_size 4 \
---per_device_eval_batch_size 4 \
+--per_device_train_batch_size 1 \
+--per_device_eval_batch_size 1 \
 --split_dataset_ratio '0.1' \
 --truncation_strategy 'left' \
 --max_length '2048' \
